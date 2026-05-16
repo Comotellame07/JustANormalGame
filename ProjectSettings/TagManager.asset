@@ -12,7 +12,7 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
+  - Button
   - 
   - 
   - 
@@ -40,6 +40,12 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Button
+    uniqueID: 504087865
+    locked: 0
+  - name: Ground
+    uniqueID: 998242895
     locked: 0
   m_RenderingLayers:
   - Default
