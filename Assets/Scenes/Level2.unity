@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 171268056}
   - component: {fileID: 171268055}
   - component: {fileID: 171268054}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: interruptor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1307,6 +1307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelGoal
   nextSceneName: 
+  isLastLevel: 1
 --- !u!1 &1246235389
 GameObject:
   m_ObjectHideFlags: 0
