@@ -4,9 +4,10 @@ public class GameProgress : MonoBehaviour
 {
     public static GameProgress Instance;
 
+    public int  ActiveSlot    { get; private set; } = -1;
     public bool HasDoubleJump { get; private set; }
-    public bool HasDash { get; private set; }
-    public int LastLevelUnlocked { get; private set; }
+    public bool HasDash       { get; private set; }
+    public int  CurrentLevel  { get; private set; } = 1;
 
     private void Awake()
     {
@@ -14,7 +15,6 @@ public class GameProgress : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadProgress();
         }
         else
         {
@@ -22,42 +22,39 @@ public class GameProgress : MonoBehaviour
         }
     }
 
+    public void LoadFromSlot(SaveData data)
+    {
+    ActiveSlot    = data.SlotId;
+    HasDoubleJump = data.DoubleJump;
+    HasDash       = data.Dash;
+    CurrentLevel  = data.CurrentLevel;
+    }
+
     public void UnlockDoubleJump()
     {
         HasDoubleJump = true;
-        PlayerPrefs.SetInt("HasDoubleJump", 1);
-        PlayerPrefs.Save();
+        PersistCurrent();
     }
 
     public void UnlockDash()
     {
         HasDash = true;
-        PlayerPrefs.SetInt("HasDash", 1);
-        PlayerPrefs.Save();
+        PersistCurrent();
     }
 
-    public void SetLastLevel(int level)
+    public void SetLevel(int level)
     {
-        if (level > LastLevelUnlocked)
-        {
-            LastLevelUnlocked = level;
-            PlayerPrefs.SetInt("LastLevel", level);
-            PlayerPrefs.Save();
-        }
+        CurrentLevel = level;
+        PersistCurrent();
     }
 
-    public void ResetProgress()
+    public void MarkCompleted()
     {
-        PlayerPrefs.DeleteAll();
-        HasDoubleJump = false;
-        HasDash = false;
-        LastLevelUnlocked = 1;
+        DatabaseManager.Instance?.MarkCompleted(ActiveSlot);
     }
 
-    private void LoadProgress()
+    private void PersistCurrent()
     {
-        HasDoubleJump = PlayerPrefs.GetInt("HasDoubleJump", 0) == 1;
-        HasDash = PlayerPrefs.GetInt("HasDash", 0) == 1;
-        LastLevelUnlocked = PlayerPrefs.GetInt("LastLevel", 1);
+        DatabaseManager.Instance?.UpdateSave(ActiveSlot, CurrentLevel, HasDoubleJump, HasDash);
     }
 }

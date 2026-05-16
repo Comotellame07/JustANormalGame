@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class LevelGoal : MonoBehaviour
 {
     [SerializeField] private string nextSceneName;
+    [SerializeField] private bool   isLastLevel = false;
     private bool levelCompleted = false;
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -14,13 +15,18 @@ public class LevelGoal : MonoBehaviour
         {
             levelCompleted = true;
 
-            if (!string.IsNullOrEmpty(nextSceneName))
+            if (isLastLevel)
             {
-                SceneManager.LoadScene(nextSceneName);
+                GameProgress.Instance?.MarkCompleted();
+                SceneManager.LoadScene("Credits");
             }
             else
             {
-                Debug.Log("Nivel completado");
+                int next = GameProgress.Instance != null
+                    ? GameProgress.Instance.CurrentLevel + 1
+                    : 1;
+                GameProgress.Instance?.SetLevel(next);
+                SceneManager.LoadScene(nextSceneName);
             }
         }
     }

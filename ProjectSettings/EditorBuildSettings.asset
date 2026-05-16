@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 07c031a38369c934389729071a6c7b6d
   - enabled: 1
+    path: Assets/Scenes/SlotSelection.unity
+    guid: c77fc5a2935040947b03ad624ea0594e
+  - enabled: 1
     path: Assets/Scenes/Level1.unity
     guid: 62aa5e94506935d4a8c40352afdb1dc3
   - enabled: 1
@@ -17,6 +20,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/Credits.unity
+    guid: 2d1d627448c3ba04cb51203584304de7
+  - enabled: 1
+    path: Assets/Scenes/LevelSelector.unity
+    guid: 8f0aeaa3223f7334aad09aedca36973b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
