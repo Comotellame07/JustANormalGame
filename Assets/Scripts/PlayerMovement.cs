@@ -20,23 +20,23 @@ public class PlayerMovement : MonoBehaviour
     [Header("Double Jump")]
     [SerializeField] private bool doubleJumpUnlocked = false;
     private bool hasDoubleJump = false;
-    private bool doubleJumpTriggered = false;
 
     [Header("Dash")]
     [SerializeField] private bool dashUnlocked = false;
     [SerializeField] private float dashForce = 15f;
     [SerializeField] private float dashDuration = 0.25f;
-    [SerializeField] private float dashCooldown = 1f;
+    [SerializeField] private float dashCooldownGround = 0.4f; // cooldown pequeño en suelo
+    private bool canDashGround = true;   // controla el cooldown en suelo
+    private bool canDashAir = true;      // un solo dash en aire hasta tocar suelo
 
     private Rigidbody2D rb;
     private float moveInput;
     private bool jumpPressed;
     private bool isGrounded;
+    private bool wasGrounded;
     private bool isDashing = false;
-    private bool canDash = true;
     private float lastFacingDirection = 1f;
 
-    // Eventos que escucha PlayerAnimationController
     public event Action OnDashStarted;
     public event Action OnDoubleJumped;
 
@@ -86,22 +86,26 @@ public class PlayerMovement : MonoBehaviour
             {
                 jumpPressed = true;
                 hasDoubleJump = doubleJumpUnlocked;
-                doubleJumpTriggered = false;
             }
             else if (doubleJumpUnlocked && hasDoubleJump)
             {
                 jumpPressed = true;
                 hasDoubleJump = false;
-                doubleJumpTriggered = true;
-                OnDoubleJumped?.Invoke();  // dispara evento inmediatamente
+                OnDoubleJumped?.Invoke();
             }
         }
 
-        if ((Keyboard.current.leftShiftKey.wasPressedThisFrame ||
-             Keyboard.current.rightShiftKey.wasPressedThisFrame)
-             && dashUnlocked && canDash && !isDashing)
+        bool dashKeyDown = Keyboard.current.leftShiftKey.wasPressedThisFrame ||
+                           Keyboard.current.rightShiftKey.wasPressedThisFrame;
+
+        if (dashKeyDown && dashUnlocked && !isDashing)
         {
-            StartCoroutine(DashCoroutine());
+            // En suelo: usa cooldown de tiempo
+            // En aire: usa el dash de aire (solo uno hasta tocar suelo)
+            if (isGrounded && canDashGround)
+                StartCoroutine(DashCoroutine());
+            else if (!isGrounded && canDashAir)
+                StartCoroutine(DashCoroutine());
         }
     }
 
@@ -109,7 +113,20 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isDashing) return;
 
+        wasGrounded = isGrounded;
         isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0f, groundLayer);
+
+        // Al aterrizar: restaura dash de aire
+        if (isGrounded && !wasGrounded)
+        {
+            canDashAir = true;
+        }
+
+        // Al dejar el suelo sin saltar (caída libre): concede doble salto si corresponde
+        if (!isGrounded && wasGrounded && doubleJumpUnlocked && !jumpPressed)
+        {
+            hasDoubleJump = true;
+        }
 
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
@@ -131,9 +148,14 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator DashCoroutine()
     {
         isDashing = true;
-        canDash = false;
 
-        OnDashStarted?.Invoke();  // dispara evento inmediatamente, sin depender de Update
+        // Marca el recurso usado según dónde se hizo el dash
+        if (isGrounded)
+            canDashGround = false;
+        else
+            canDashAir = false;
+
+        OnDashStarted?.Invoke();
 
         float dashDirection = moveInput != 0 ? Mathf.Sign(moveInput) : lastFacingDirection;
         rb.linearVelocity = new Vector2(dashDirection * dashForce, 0f);
@@ -142,9 +164,12 @@ public class PlayerMovement : MonoBehaviour
 
         isDashing = false;
 
-        yield return new WaitForSeconds(dashCooldown);
-
-        canDash = true;
+        // Solo el dash de suelo tiene cooldown de tiempo
+        if (!canDashGround)
+        {
+            yield return new WaitForSeconds(dashCooldownGround);
+            canDashGround = true;
+        }
     }
 
     private void OnDrawGizmosSelected()
