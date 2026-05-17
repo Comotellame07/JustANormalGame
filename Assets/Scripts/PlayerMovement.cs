@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Dash")]
     [SerializeField] private bool dashUnlocked = false;
     [SerializeField] private float dashForce = 15f;
-    [SerializeField] private float dashDuration = 0.15f;
+    [SerializeField] private float dashDuration = 0.25f;
     [SerializeField] private float dashCooldown = 1f;
 
     private Rigidbody2D rb;
@@ -149,6 +149,9 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(dashDuration);
 
         isDashing = false;
+
+        // Espera un frame extra para que PlayerAnimationController reciba el false correctamente
+        yield return null;
 
         yield return new WaitForSeconds(dashCooldown);
 
