@@ -12,7 +12,7 @@ public class PlayerAnimationController : MonoBehaviour
     private readonly int speedHash = Animator.StringToHash("Speed");
     private readonly int isGroundedHash = Animator.StringToHash("IsGrounded");
     private readonly int verticalVelocityHash = Animator.StringToHash("VerticalVelocity");
-    private readonly int dashTriggeredHash = Animator.StringToHash("DashTriggered");
+    private readonly int isDashingHash = Animator.StringToHash("IsDashing");
     private readonly int doubleJumpTriggeredHash = Animator.StringToHash("DoubleJumpTriggered");
 
     private void Awake()
@@ -25,23 +25,6 @@ public class PlayerAnimationController : MonoBehaviour
             spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void OnEnable()
-    {
-        playerMovement.OnDashStarted += HandleDash;
-        playerMovement.OnDoubleJumped += HandleDoubleJump;
-    }
-
-    private void OnDisable()
-    {
-        playerMovement.OnDashStarted -= HandleDash;
-        playerMovement.OnDoubleJumped -= HandleDoubleJump;
-    }
-
-    private void HandleDash()
-    {
-        animator.SetTrigger(dashTriggeredHash);
-    }
-
     private void HandleDoubleJump()
     {
         animator.SetTrigger(doubleJumpTriggeredHash);
@@ -52,6 +35,7 @@ public class PlayerAnimationController : MonoBehaviour
         animator.SetFloat(speedHash, Mathf.Abs(playerMovement.MoveInput));
         animator.SetBool(isGroundedHash, playerMovement.IsGrounded);
         animator.SetFloat(verticalVelocityHash, playerMovement.VerticalVelocity);
+        animator.SetBool(isDashingHash, playerMovement.IsDashing); // ← nuevo
     }
 
     private void LateUpdate()

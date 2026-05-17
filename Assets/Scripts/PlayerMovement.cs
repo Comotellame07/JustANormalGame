@@ -45,6 +45,8 @@ public class PlayerMovement : MonoBehaviour
     public bool IsGrounded => isGrounded;
     public float FacingDirection => lastFacingDirection;
 
+    public bool IsDashing => isDashing;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
