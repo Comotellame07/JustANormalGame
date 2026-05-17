@@ -339,6 +339,7 @@ GameObject:
   - component: {fileID: 155308587}
   - component: {fileID: 155308591}
   - component: {fileID: 155308590}
+  - component: {fileID: 155308592}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -485,14 +486,14 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 14
   groundCheck: {fileID: 1291908596}
-  groundCheckSize: {x: 0.9, y: 0.07}
+  groundCheckSize: {x: 0.5, y: 0.2}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
   fallMultiplier: 2.5
   lowJumpMultiplier: 5
-  doubleJumpUnlocked: 0
-  dashUnlocked: 0
+  doubleJumpUnlocked: 1
+  dashUnlocked: 1
   dashForce: 15
   dashDuration: 0.15
   dashCooldown: 0
@@ -530,7 +531,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.04}
+  m_Offset: {x: 0.015, y: -0.04}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -540,8 +541,23 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.5, y: 0.7}
+  m_Size: {x: 0.3, y: 0.7}
   m_EdgeRadius: 0
+--- !u!114 &155308592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155308583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab942d6574c54b24abd07a7c5e8bb7b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationController
+  playerMovement: {fileID: 155308590}
+  animator: {fileID: 155308588}
+  spriteRenderer: {fileID: 155308589}
 --- !u!1 &264594186
 GameObject:
   m_ObjectHideFlags: 0
@@ -1477,7 +1493,7 @@ Transform:
   m_GameObject: {fileID: 1291908595}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.4, z: 0}
+  m_LocalPosition: {x: 0.015, y: -0.4, z: 0}
   m_LocalScale: {x: 0.52713454, y: 0.1282, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

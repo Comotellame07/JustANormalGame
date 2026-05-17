@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Double Jump")]
     [SerializeField] private bool doubleJumpUnlocked = false;
     private bool hasDoubleJump = false;
+    private bool doubleJumpTriggered = false;
 
     [Header("Dash")]
     [SerializeField] private bool dashUnlocked = false;
@@ -32,6 +33,14 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private bool isDashing = false;
     private bool canDash = true;
+    private float lastFacingDirection = 1f;
+
+    public float MoveInput => moveInput;
+    public float VerticalVelocity => rb != null ? rb.linearVelocity.y : 0f;
+    public bool IsGrounded => isGrounded;
+    public bool IsDashing => isDashing;
+    public bool DoubleJumpTriggered => doubleJumpTriggered;
+    public float FacingDirection => lastFacingDirection;
 
     private void Awake()
     {
@@ -69,6 +78,11 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             moveInput = 1f;
 
+        if (moveInput > 0.01f)
+            lastFacingDirection = 1f;
+        else if (moveInput < -0.01f)
+            lastFacingDirection = -1f;
+
         bool jumpKeyDown = Keyboard.current.spaceKey.wasPressedThisFrame ||
                            Keyboard.current.wKey.wasPressedThisFrame ||
                            Keyboard.current.upArrowKey.wasPressedThisFrame;
@@ -79,11 +93,13 @@ public class PlayerMovement : MonoBehaviour
             {
                 jumpPressed = true;
                 hasDoubleJump = doubleJumpUnlocked;
+                doubleJumpTriggered = false;
             }
             else if (doubleJumpUnlocked && hasDoubleJump)
             {
                 jumpPressed = true;
                 hasDoubleJump = false;
+                doubleJumpTriggered = true;
             }
         }
 
@@ -111,14 +127,14 @@ public class PlayerMovement : MonoBehaviour
 
         if (rb.linearVelocity.y < 0)
         {
-            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
         }
         else if (rb.linearVelocity.y > 0 &&
                  !(Keyboard.current.spaceKey.isPressed ||
                    Keyboard.current.wKey.isPressed ||
                    Keyboard.current.upArrowKey.isPressed))
         {
-            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
+            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
         }
     }
 
@@ -127,19 +143,27 @@ public class PlayerMovement : MonoBehaviour
         isDashing = true;
         canDash = false;
 
-        float dashDirection = moveInput != 0 ? moveInput : (transform.localScale.x > 0 ? 1f : -1f);
+        float dashDirection = moveInput != 0 ? Mathf.Sign(moveInput) : lastFacingDirection;
         rb.linearVelocity = new Vector2(dashDirection * dashForce, 0f);
 
         yield return new WaitForSeconds(dashDuration);
+
         isDashing = false;
 
         yield return new WaitForSeconds(dashCooldown);
+
         canDash = true;
+    }
+
+    public void ConsumeDoubleJumpTrigger()
+    {
+        doubleJumpTriggered = false;
     }
 
     private void OnDrawGizmosSelected()
     {
         if (groundCheck == null) return;
+
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
     }
