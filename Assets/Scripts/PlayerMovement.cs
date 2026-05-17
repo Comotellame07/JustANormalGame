@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -35,11 +36,13 @@ public class PlayerMovement : MonoBehaviour
     private bool canDash = true;
     private float lastFacingDirection = 1f;
 
+    // Eventos que escucha PlayerAnimationController
+    public event Action OnDashStarted;
+    public event Action OnDoubleJumped;
+
     public float MoveInput => moveInput;
     public float VerticalVelocity => rb != null ? rb.linearVelocity.y : 0f;
     public bool IsGrounded => isGrounded;
-    public bool IsDashing => isDashing;
-    public bool DoubleJumpTriggered => doubleJumpTriggered;
     public float FacingDirection => lastFacingDirection;
 
     private void Awake()
@@ -56,15 +59,8 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void UnlockDoubleJump()
-    {
-        doubleJumpUnlocked = true;
-    }
-
-    public void UnlockDash()
-    {
-        dashUnlocked = true;
-    }
+    public void UnlockDoubleJump() => doubleJumpUnlocked = true;
+    public void UnlockDash() => dashUnlocked = true;
 
     private void Update()
     {
@@ -74,14 +70,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
             moveInput = -1f;
-
         if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             moveInput = 1f;
 
-        if (moveInput > 0.01f)
-            lastFacingDirection = 1f;
-        else if (moveInput < -0.01f)
-            lastFacingDirection = -1f;
+        if (moveInput > 0.01f) lastFacingDirection = 1f;
+        else if (moveInput < -0.01f) lastFacingDirection = -1f;
 
         bool jumpKeyDown = Keyboard.current.spaceKey.wasPressedThisFrame ||
                            Keyboard.current.wKey.wasPressedThisFrame ||
@@ -100,6 +93,7 @@ public class PlayerMovement : MonoBehaviour
                 jumpPressed = true;
                 hasDoubleJump = false;
                 doubleJumpTriggered = true;
+                OnDoubleJumped?.Invoke();  // dispara evento inmediatamente
             }
         }
 
@@ -126,22 +120,20 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if (rb.linearVelocity.y < 0)
-        {
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
-        }
         else if (rb.linearVelocity.y > 0 &&
                  !(Keyboard.current.spaceKey.isPressed ||
                    Keyboard.current.wKey.isPressed ||
                    Keyboard.current.upArrowKey.isPressed))
-        {
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
-        }
     }
 
     private IEnumerator DashCoroutine()
     {
         isDashing = true;
         canDash = false;
+
+        OnDashStarted?.Invoke();  // dispara evento inmediatamente, sin depender de Update
 
         float dashDirection = moveInput != 0 ? Mathf.Sign(moveInput) : lastFacingDirection;
         rb.linearVelocity = new Vector2(dashDirection * dashForce, 0f);
@@ -150,23 +142,14 @@ public class PlayerMovement : MonoBehaviour
 
         isDashing = false;
 
-        // Espera un frame extra para que PlayerAnimationController reciba el false correctamente
-        yield return null;
-
         yield return new WaitForSeconds(dashCooldown);
 
         canDash = true;
     }
 
-    public void ConsumeDoubleJumpTrigger()
-    {
-        doubleJumpTriggered = false;
-    }
-
     private void OnDrawGizmosSelected()
     {
         if (groundCheck == null) return;
-
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
     }
