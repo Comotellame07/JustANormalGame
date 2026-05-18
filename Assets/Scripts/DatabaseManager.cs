@@ -32,9 +32,7 @@ public class DatabaseManager : MonoBehaviour
         {
             var existing = db.Find<SaveData>(i);
             if (existing == null)
-            {
                 db.Insert(new SaveData { SlotId = i });
-            }
         }
     }
 
@@ -48,23 +46,25 @@ public class DatabaseManager : MonoBehaviour
         var save = db.Find<SaveData>(slotId);
         if (save == null) return;
 
-        save.Exists       = true;
-        save.CurrentLevel = 1;
-        save.IsCompleted  = false;
-        save.DoubleJump   = false;
-        save.Dash         = false;
+        save.Exists        = true;
+        save.CurrentLevel  = 1;
+        save.IsCompleted   = false;
+        save.DoubleJump    = false;
+        save.Dash          = false;
+        save.CheckpointId  = -1;
 
         db.Update(save);
     }
 
-    public void UpdateSave(int slotId, int currentLevel, bool doubleJump, bool dash)
+    public void UpdateSave(int slotId, int currentLevel, bool doubleJump, bool dash, int checkpointId)
     {
         var save = db.Find<SaveData>(slotId);
         if (save == null) return;
 
-        save.CurrentLevel = currentLevel;
-        save.DoubleJump   = doubleJump;
-        save.Dash         = dash;
+        save.CurrentLevel  = currentLevel;
+        save.DoubleJump    = doubleJump;
+        save.Dash          = dash;
+        save.CheckpointId  = checkpointId;
 
         db.Update(save);
     }
@@ -83,11 +83,12 @@ public class DatabaseManager : MonoBehaviour
         var save = db.Find<SaveData>(slotId);
         if (save == null) return;
 
-        save.Exists       = false;
-        save.CurrentLevel = 1;
-        save.IsCompleted  = false;
-        save.DoubleJump   = false;
-        save.Dash         = false;
+        save.Exists        = false;
+        save.CurrentLevel  = 1;
+        save.IsCompleted   = false;
+        save.DoubleJump    = false;
+        save.Dash          = false;
+        save.CheckpointId  = -1;
 
         db.Update(save);
     }

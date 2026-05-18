@@ -2,25 +2,41 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
-    [Header("Visual")]
-    [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private Sprite         spriteInactive;
-    [SerializeField] private Sprite         spriteActive;
+    [Header("ID único por checkpoint en esta escena")]
+    [SerializeField] public int checkpointId;
 
-    private bool activated = false;
+    [Header("Sprites")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Sprite         spriteActive;
+    [SerializeField] private Sprite         spriteInactive;
+
+    private bool isActive = false;
+
+    public bool IsActive => isActive;
+
+    private void Awake()
+    {
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    /// <summary>
+    /// Llamado por CheckpointManager al cargar la escena o al activar este checkpoint.
+    /// </summary>
+    public void SetActive(bool active)
+    {
+        isActive               = active;
+        spriteRenderer.sprite  = active ? spriteActive : spriteInactive;
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (activated) return;
         if (!other.CompareTag("Player")) return;
 
-        activated = true;
+        // Si ya es el activo no hace falta hacer nada
+        if (isActive) return;
 
-        // Actualiza el checkpoint en el jugador
-        other.GetComponent<PlayerRespawn>()?.SetCheckpoint(transform);
-
-        // Cambia el sprite si tienes uno configurado
-        if (spriteRenderer != null && spriteActive != null)
-            spriteRenderer.sprite = spriteActive;
+        // Notifica al manager que este es el nuevo checkpoint activo
+        CheckpointManager.Instance?.ActivateCheckpoint(this);
     }
 }

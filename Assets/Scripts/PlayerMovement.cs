@@ -36,16 +36,18 @@ public class PlayerMovement : MonoBehaviour
     private bool wasGrounded;
     private bool isDashing = false;
     private bool inputEnabled = true;
+    private bool isHit = false;
     private float lastFacingDirection = 1f;
 
     public event Action OnDashStarted;
     public event Action OnDoubleJumped;
 
-    public float MoveInput => moveInput;
+    public float MoveInput        => moveInput;
     public float VerticalVelocity => rb != null ? rb.linearVelocity.y : 0f;
-    public bool IsGrounded => isGrounded;
-    public float FacingDirection => lastFacingDirection;
-    public bool IsDashing => isDashing;
+    public bool  IsGrounded       => isGrounded;
+    public float FacingDirection  => lastFacingDirection;
+    public bool  IsDashing        => isDashing;
+    public bool  IsHit            => isHit;
 
     private void Awake()
     {
@@ -57,7 +59,7 @@ public class PlayerMovement : MonoBehaviour
         if (GameProgress.Instance != null)
         {
             if (GameProgress.Instance.HasDoubleJump) UnlockDoubleJump();
-            if (GameProgress.Instance.HasDash) UnlockDash();
+            if (GameProgress.Instance.HasDash)       UnlockDash();
         }
     }
 
@@ -74,9 +76,14 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void SetHitState(bool hit)
+    {
+        isHit = hit;
+    }
+
     private void Update()
     {
-        if (isDashing) return;
+        if (isDashing)     return;
         if (!inputEnabled) return;
 
         moveInput = 0f;
@@ -90,15 +97,15 @@ public class PlayerMovement : MonoBehaviour
         else if (moveInput < -0.01f) lastFacingDirection = -1f;
 
         bool jumpKeyDown = Keyboard.current.spaceKey.wasPressedThisFrame ||
-                           Keyboard.current.wKey.wasPressedThisFrame ||
+                           Keyboard.current.wKey.wasPressedThisFrame     ||
                            Keyboard.current.upArrowKey.wasPressedThisFrame;
 
         if (jumpKeyDown)
         {
             if (isGrounded)
             {
-                jumpPressed    = true;
-                hasDoubleJump  = doubleJumpUnlocked;
+                jumpPressed   = true;
+                hasDoubleJump = doubleJumpUnlocked;
             }
             else if (doubleJumpUnlocked && hasDoubleJump)
             {
@@ -151,7 +158,7 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
         else if (rb.linearVelocity.y > 0 &&
                  !(Keyboard.current.spaceKey.isPressed ||
-                   Keyboard.current.wKey.isPressed ||
+                   Keyboard.current.wKey.isPressed     ||
                    Keyboard.current.upArrowKey.isPressed))
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
     }
