@@ -1,4 +1,3 @@
-// KeyManager.cs
 using UnityEngine;
 
 public class KeyManager : MonoBehaviour
@@ -15,12 +14,28 @@ public class KeyManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        // Restaura llaves guardadas al cargar la escena
+        if (GameProgress.Instance != null)
+            keysCollected = GameProgress.Instance.KeysCollected;
+
+        KeyHUD.Instance?.UpdateHUD(keysCollected, keysRequired);
+
+        if (keysCollected >= keysRequired && door != null)
+            door.SetActive(false);
+    }
+
     public void AddKey()
     {
         keysCollected++;
+        GameProgress.Instance?.AddKey();
+        KeyHUD.Instance?.UpdateHUD(keysCollected, keysRequired);
+
         if (keysCollected >= keysRequired && door != null)
             door.SetActive(false);
     }
 
     public int KeysCollected => keysCollected;
+    public int KeysRequired  => keysRequired;
 }

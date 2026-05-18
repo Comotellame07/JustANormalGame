@@ -1,11 +1,13 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class CheckpointManager : MonoBehaviour
 {
     public static CheckpointManager Instance;
 
     [SerializeField] private Checkpoint[] checkpoints;
+
+    // Spawn inicial de la escena (donde aparece el jugador si no hay checkpoint)
+    [SerializeField] private Transform defaultSpawn;
 
     private Checkpoint activeCheckpoint = null;
 
@@ -20,41 +22,45 @@ public class CheckpointManager : MonoBehaviour
         foreach (var cp in checkpoints)
             cp.SetActive(false);
 
-        // Restaura el checkpoint guardado en GameProgress si existe
+        PlayerRespawn respawn = FindFirstObjectByType<PlayerRespawn>();
+
         if (GameProgress.Instance != null && GameProgress.Instance.CheckpointId >= 0)
         {
+            // Hay checkpoint guardado: actívalo y teletransporta al jugador
             Checkpoint saved = FindById(GameProgress.Instance.CheckpointId);
             if (saved != null)
             {
                 saved.SetActive(true);
                 activeCheckpoint = saved;
-                ApplyToRespawn();
+
+                if (respawn != null)
+                {
+                    respawn.SetCheckpoint(saved.transform);
+                    respawn.transform.position = saved.transform.position;
+                }
             }
+        }
+        else
+        {
+            // Sin checkpoint: teletransporta al spawn inicial
+            if (respawn != null && defaultSpawn != null)
+                respawn.transform.position = defaultSpawn.position;
         }
     }
 
     public void ActivateCheckpoint(Checkpoint newCheckpoint)
     {
-        // Desactiva el anterior si había uno
         if (activeCheckpoint != null && activeCheckpoint != newCheckpoint)
             activeCheckpoint.SetActive(false);
 
-        // Activa el nuevo
         newCheckpoint.SetActive(true);
         activeCheckpoint = newCheckpoint;
 
-        // Guarda en GameProgress (que lo persiste en la BD)
         GameProgress.Instance?.SetCheckpoint(newCheckpoint.checkpointId);
 
-        // Actualiza el PlayerRespawn
-        ApplyToRespawn();
-    }
-
-    private void ApplyToRespawn()
-    {
         PlayerRespawn respawn = FindFirstObjectByType<PlayerRespawn>();
-        if (respawn != null && activeCheckpoint != null)
-            respawn.SetCheckpoint(activeCheckpoint.transform);
+        if (respawn != null)
+            respawn.SetCheckpoint(newCheckpoint.transform);
     }
 
     private Checkpoint FindById(int id)

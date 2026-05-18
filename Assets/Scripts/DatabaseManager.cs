@@ -46,17 +46,18 @@ public class DatabaseManager : MonoBehaviour
         var save = db.Find<SaveData>(slotId);
         if (save == null) return;
 
-        save.Exists        = true;
-        save.CurrentLevel  = 1;
-        save.IsCompleted   = false;
-        save.DoubleJump    = false;
-        save.Dash          = false;
-        save.CheckpointId  = -1;
+        save.Exists         = true;
+        save.CurrentLevel   = 1;
+        save.IsCompleted    = false;
+        save.DoubleJump     = false;
+        save.Dash           = false;
+        save.CheckpointId   = -1;
+        save.KeysCollected  = 0;
 
         db.Update(save);
     }
 
-    public void UpdateSave(int slotId, int currentLevel, bool doubleJump, bool dash, int checkpointId)
+    public void UpdateSave(int slotId, int currentLevel, bool doubleJump, bool dash, int checkpointId, int keysCollected)
     {
         var save = db.Find<SaveData>(slotId);
         if (save == null) return;
@@ -65,6 +66,7 @@ public class DatabaseManager : MonoBehaviour
         save.DoubleJump    = doubleJump;
         save.Dash          = dash;
         save.CheckpointId  = checkpointId;
+        save.KeysCollected = keysCollected;
 
         db.Update(save);
     }
@@ -89,6 +91,7 @@ public class DatabaseManager : MonoBehaviour
         save.DoubleJump    = false;
         save.Dash          = false;
         save.CheckpointId  = -1;
+        save.KeysCollected = 0;
 
         db.Update(save);
     }

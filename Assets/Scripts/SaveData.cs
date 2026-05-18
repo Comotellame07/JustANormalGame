@@ -23,5 +23,8 @@ public class SaveData
     public bool Dash { get; set; } = false;
 
     [Column("checkpoint_id")]
-    public int CheckpointId { get; set; } = -1; // -1 = sin checkpoint guardado
+    public int CheckpointId { get; set; } = -1;
+
+    [Column("keys_collected")]
+    public int KeysCollected { get; set; } = 0;
 }

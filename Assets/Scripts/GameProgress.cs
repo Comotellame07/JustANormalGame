@@ -9,6 +9,7 @@ public class GameProgress : MonoBehaviour
     public bool HasDash       { get; private set; }
     public int  CurrentLevel  { get; private set; } = 1;
     public int  CheckpointId  { get; private set; } = -1;
+    public int  KeysCollected { get; private set; } = 0;
 
     private void Awake()
     {
@@ -30,6 +31,7 @@ public class GameProgress : MonoBehaviour
         HasDash       = data.Dash;
         CurrentLevel  = data.CurrentLevel;
         CheckpointId  = data.CheckpointId;
+        KeysCollected = data.KeysCollected;
     }
 
     public void UnlockDoubleJump()
@@ -46,8 +48,9 @@ public class GameProgress : MonoBehaviour
 
     public void SetLevel(int level)
     {
-        CurrentLevel = level;
-        CheckpointId = -1; // Al cambiar de nivel se resetea el checkpoint
+        CurrentLevel  = level;
+        CheckpointId  = -1;
+        KeysCollected = 0;
         PersistCurrent();
     }
 
@@ -57,13 +60,20 @@ public class GameProgress : MonoBehaviour
         PersistCurrent();
     }
 
-    private void PersistCurrent()
+    public void AddKey()
     {
-        DatabaseManager.Instance?.UpdateSave(ActiveSlot, CurrentLevel, HasDoubleJump, HasDash, CheckpointId);
+        KeysCollected++;
+        PersistCurrent();
     }
 
     public void MarkCompleted()
     {
         DatabaseManager.Instance?.MarkCompleted(ActiveSlot);
+    }
+
+    private void PersistCurrent()
+    {
+        DatabaseManager.Instance?.UpdateSave(
+            ActiveSlot, CurrentLevel, HasDoubleJump, HasDash, CheckpointId, KeysCollected);
     }
 }
