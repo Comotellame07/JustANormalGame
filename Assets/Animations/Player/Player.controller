@@ -45,9 +45,6 @@ AnimatorStateTransition:
   - m_ConditionMode: 3
     m_ConditionEvent: VerticalVelocity
     m_EventTreshold: 0.1
-  - m_ConditionMode: 1
-    m_ConditionEvent: DoubleJumpTriggered
-    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -6523353273312261416}
   m_Solo: 0

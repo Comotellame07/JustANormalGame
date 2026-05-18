@@ -41,8 +41,14 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 3707674401
+    locked: 0
   - name: Button
     uniqueID: 504087865
+    locked: 0
+  - name: Player
+    uniqueID: 3233747161
     locked: 0
   - name: Ground
     uniqueID: 998242895
