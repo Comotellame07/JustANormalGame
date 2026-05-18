@@ -25,9 +25,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool dashUnlocked = false;
     [SerializeField] private float dashForce = 15f;
     [SerializeField] private float dashDuration = 0.25f;
-    [SerializeField] private float dashCooldownGround = 0.4f; // cooldown pequeño en suelo
-    private bool canDashGround = true;   // controla el cooldown en suelo
-    private bool canDashAir = true;      // un solo dash en aire hasta tocar suelo
+    [SerializeField] private float dashCooldownGround = 0.4f;
+    private bool canDashGround = true;
+    private bool canDashAir = true;
 
     private Rigidbody2D rb;
     private float moveInput;
@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private bool wasGrounded;
     private bool isDashing = false;
+    private bool inputEnabled = true;
     private float lastFacingDirection = 1f;
 
     public event Action OnDashStarted;
@@ -44,7 +45,6 @@ public class PlayerMovement : MonoBehaviour
     public float VerticalVelocity => rb != null ? rb.linearVelocity.y : 0f;
     public bool IsGrounded => isGrounded;
     public float FacingDirection => lastFacingDirection;
-
     public bool IsDashing => isDashing;
 
     private void Awake()
@@ -62,11 +62,22 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public void UnlockDoubleJump() => doubleJumpUnlocked = true;
-    public void UnlockDash() => dashUnlocked = true;
+    public void UnlockDash()       => dashUnlocked = true;
+
+    public void SetInputEnabled(bool enabled)
+    {
+        inputEnabled = enabled;
+        if (!enabled)
+        {
+            moveInput   = 0f;
+            jumpPressed = false;
+        }
+    }
 
     private void Update()
     {
         if (isDashing) return;
+        if (!inputEnabled) return;
 
         moveInput = 0f;
 
@@ -75,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             moveInput = 1f;
 
-        if (moveInput > 0.01f) lastFacingDirection = 1f;
+        if (moveInput > 0.01f)       lastFacingDirection = 1f;
         else if (moveInput < -0.01f) lastFacingDirection = -1f;
 
         bool jumpKeyDown = Keyboard.current.spaceKey.wasPressedThisFrame ||
@@ -86,12 +97,12 @@ public class PlayerMovement : MonoBehaviour
         {
             if (isGrounded)
             {
-                jumpPressed = true;
-                hasDoubleJump = doubleJumpUnlocked;
+                jumpPressed    = true;
+                hasDoubleJump  = doubleJumpUnlocked;
             }
             else if (doubleJumpUnlocked && hasDoubleJump)
             {
-                jumpPressed = true;
+                jumpPressed   = true;
                 hasDoubleJump = false;
                 OnDoubleJumped?.Invoke();
             }
@@ -102,8 +113,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (dashKeyDown && dashUnlocked && !isDashing)
         {
-            // En suelo: usa cooldown de tiempo
-            // En aire: usa el dash de aire (solo uno hasta tocar suelo)
             if (isGrounded && canDashGround)
                 StartCoroutine(DashCoroutine());
             else if (!isGrounded && canDashAir)
@@ -115,20 +124,20 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isDashing) return;
 
+        if (!inputEnabled)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
+
         wasGrounded = isGrounded;
-        isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0f, groundLayer);
+        isGrounded  = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0f, groundLayer);
 
-        // Al aterrizar: restaura dash de aire
         if (isGrounded && !wasGrounded)
-        {
             canDashAir = true;
-        }
 
-        // Al dejar el suelo sin saltar (caída libre): concede doble salto si corresponde
         if (!isGrounded && wasGrounded && doubleJumpUnlocked && !jumpPressed)
-        {
             hasDoubleJump = true;
-        }
 
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
@@ -151,11 +160,8 @@ public class PlayerMovement : MonoBehaviour
     {
         isDashing = true;
 
-        // Marca el recurso usado según dónde se hizo el dash
-        if (isGrounded)
-            canDashGround = false;
-        else
-            canDashAir = false;
+        if (isGrounded) canDashGround = false;
+        else            canDashAir    = false;
 
         OnDashStarted?.Invoke();
 
@@ -166,7 +172,6 @@ public class PlayerMovement : MonoBehaviour
 
         isDashing = false;
 
-        // Solo el dash de suelo tiene cooldown de tiempo
         if (!canDashGround)
         {
             yield return new WaitForSeconds(dashCooldownGround);
