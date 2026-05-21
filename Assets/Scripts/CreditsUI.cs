@@ -11,7 +11,6 @@ public class CreditsUI : MonoBehaviour
     private void Start()
     {
         bool es = LanguageManager.IsSpanish();
-
         creditsText.text = es ? GetCreditsES() : GetCreditsEN();
         StartCoroutine(AutoReturn());
     }
@@ -22,11 +21,11 @@ JUST A NORMAL GAME
 Desarrollo completo
 Darío Moreno
 
-Diseño de assets y animaciones
-Pixel Adventure 1
-por Pixel Frog
-(assets utilizados bajo licencia de uso libre
-con atribución — itch.io)
+Personaje y animaciones
+Creados por Darío Moreno
+
+Resto de assets
+Generados con inteligencia artificial
 
 Gracias por jugar.
 ";
@@ -37,11 +36,11 @@ JUST A NORMAL GAME
 Full development
 Darío Moreno
 
-Asset design & animations
-Pixel Adventure 1
-by Pixel Frog
-(assets used under free license
-with attribution — itch.io)
+Character & animations
+Created by Darío Moreno
+
+Other assets
+Generated with artificial intelligence
 
 Thanks for playing.
 ";

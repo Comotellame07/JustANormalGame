@@ -4,25 +4,37 @@ using TMPro;
 
 public class LevelSelectorUI : MonoBehaviour
 {
-    [SerializeField] private TMP_Text titleText;
+    [Header("Título con imagen (ES / EN)")]
+    [SerializeField] private GameObject titleImageES;
+    [SerializeField] private GameObject titleImageEN;
+
+    [Header("Botones de texto")]
     [SerializeField] private TMP_Text btnBackText;
     [SerializeField] private TMP_Text btnLevel1Text;
-    [SerializeField] private TMP_Text btnLevel2Text;
 
     private void Start()
     {
-        bool es = LanguageManager.IsSpanish();
-        titleText.text    = es ? "Seleccionar nivel" : "Select level";
-        btnBackText.text  = es ? "Volver"            : "Back";
-        btnLevel1Text.text = es ? "Nivel 1"          : "Level 1";
-        btnLevel2Text.text = es ? "Nivel 2"          : "Level 2";
+        ApplyLanguage();
+        LanguageManager.OnLanguageChanged += ApplyLanguage;
     }
 
-    public void OnLevel1() { SceneManager.LoadScene("Level1"); }
-    public void OnLevel2() { SceneManager.LoadScene("Level2"); }
-
-    public void OnBack()
+    private void OnDestroy()
     {
-        SceneManager.LoadScene("SlotSelection");
+        LanguageManager.OnLanguageChanged -= ApplyLanguage;
     }
+
+    private void ApplyLanguage()
+    {
+        bool es = LanguageManager.IsSpanish();
+
+        titleImageES.SetActive(es);
+        titleImageEN.SetActive(!es);
+
+        btnBackText.text   = es ? "Volver"      : "Back";
+        btnLevel1Text.text = es ? "Mazmorras"   : "Dungeons";
+    }
+
+    public void OnLevel1() { SceneManager.LoadScene("Seccion1-Mazmorras"); }
+
+    public void OnBack()   { SceneManager.LoadScene("SlotSelection"); }
 }

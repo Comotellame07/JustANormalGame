@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c0c6588a82136934795d9ed127d17af4
+guid: ab0885cf27986ee41a25faaadecabd96
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3398825936964105584
-    second: Titulo_idiomas_0
+      213: -6947481570893936256
+    second: Fondo_Slots_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Titulo_idiomas_0
+      name: Fondo_Slots_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1672
-        height: 941
+        width: 971
+        height: 1619
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 07531229e2e0b2f20800000000000000
-      internalID: 3398825936964105584
+      spriteID: 0894b431256959f90800000000000000
+      internalID: -6947481570893936256
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Titulo_idiomas_0: 3398825936964105584
+      Fondo_Slots_0: -6947481570893936256
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
